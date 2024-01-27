@@ -1,7 +1,7 @@
 const express = require('express');
 const http = require('node:http');
 const { keysToCamel } = require('../common/utils');
-const { MongoClient } = require('mongodb');
+const { MongoClient, Db, Int32 } = require('mongodb');
 require('dotenv').config();
 const connectToDb = require('../server/mongodb');
 const { hostname } = require('node:os');
@@ -37,7 +37,7 @@ familyRouter.get('/:family', async(req, res) => {
             )
         );
 
-        res.status(200).json(data);
+        res.status(200).json(keysToCamel(data));
     } catch (err) {
         console.log(err.message);
     }
@@ -64,5 +64,43 @@ familyRouter.get('/:family/:patient', async(req, res) => {
         console.log(err.message);
     }
 });
+
+// POST request to add family member to the family
+familyRouter.post('/:family/create', async(req, res) => {
+    try {
+        const familyName = req.params.family.toString();
+        const { patientMrn, firstName, lastName, sex, dob, drugs } = req.body;
+        const database = await connectToDb();
+        const patients = database.collection(mongodb_collection);
+        const family = database.collection("kaiserPermanente");
+        const newPatient = await patients.insertOne({
+            "mrn": patientMrn,
+            "first_name": firstName,
+            "last_name": lastName,
+            "sex": sex,
+            "dob": dob,
+            "drugs": drugs
+        });
+        await family.findOneAndUpdate({"name": familyName}, {$push : {patients : patientMrn}})
+        res.status(201).json(keysToCamel(newPatient));
+    } catch(err) {
+        console.log(err.message);
+    }
+});
+
+// PUT request to add drug to member's file
+familyRouter.put('/:family/update/:patientMrn/:drug/', async(req, res) => {
+    try {
+        const database = await connectToDb();
+        const patientMrn = parseInt(req.params.patientMrn);
+        const drug = req.params.drug.toString();
+        const patients = database.collection(mongodb_collection);
+        const patient = await patients.findOneAndUpdate({"mrn": patientMrn}, {$push : {"drugs": drug}});
+        res.status(200).json(keysToCamel(patient));
+    } catch(err) {
+        console.log(err.message);
+    }
+});
+
 
 module.exports = familyRouter;

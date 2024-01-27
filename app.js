@@ -18,7 +18,7 @@ app.use(
   
 // add all routes under here
 app.use(express.json()); // for req.body
-app.use('/family/:family/:patient/ddi', ddi);
+app.use('/ddi', ddi);
 app.use('/patients', patients);
 app.use('/family', familyRouter);
 
