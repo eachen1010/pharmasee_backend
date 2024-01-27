@@ -12,3 +12,7 @@ jspm_packages/
 # dotenv
 .env
 .env.test
+
+# locks
+package-lock.json
+package.json
