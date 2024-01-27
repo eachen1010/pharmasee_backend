@@ -1,14 +1,16 @@
 const express = require('express');
+const http = require('node:http');
 const { keysToCamel } = require('../common/utils');
 const { MongoClient } = require('mongodb');
 require('dotenv').config();
-const { connectToDb } = require('../server/mongodb');
+const connectToDb = require('../server/mongodb');
+const { hostname } = require('node:os');
 const mongodb_collection = process.env.MONGODB_COLLECTION;
 
 
-const hospitalRouter = express.Router();
+const familyRouter = express.Router();
 
-hospitalRouter.get('/', async(req, res) => {
+familyRouter.get('/', async(req, res) => {
     try {
         const database = await connectToDb();
         const patients = database.collection("kaiserPermanente");
@@ -19,28 +21,37 @@ hospitalRouter.get('/', async(req, res) => {
     }
 });
 
-// GET request for all patients in the hospital
-hospitalRouter.get('/:hospital', async(req, res) => {
+// GET request for all patients in the family
+familyRouter.get('/:family', async(req, res) => {
     try {
-        const hospitalName = req.params.hospital.toString();
+        const familyName = req.params.family.toString();
         const database = await connectToDb();
-        const patients = database.collection(`${hospitalName}`);
-        const allPatients = await patients.findOne({"name": hospitalName});
-        res.status(200).json(keysToCamel(allPatients));
+        const patients = database.collection("kaiserPermanente");
+        const allPatients = await patients.findOne({"name": familyName});
+        let data = [];
+        const collection = database.collection(process.env.MONGODB_COLLECTION);
+        
+        await Promise.all(
+            allPatients.patients.map((mrn) => 
+                collection.findOne({"mrn": mrn}).then((result) => data.push(result))
+            )
+        );
+
+        res.status(200).json(data);
     } catch (err) {
         console.log(err.message);
     }
 });
 
 // GET request for single patient's information
-hospitalRouter.get('/:hospital/:patient', async(req, res) => {
+familyRouter.get('/:family/:patient', async(req, res) => {
     try {
-        const hospitalName = req.params.hospital.toString();
+        const familyName = req.params.family.toString();
         const patientMrn = parseInt(req.params.patient);
         const database = await connectToDb();
-        const patients = database.collection(`${hospitalName}`);
-        const hospital = await patients.findOne({"name": hospitalName});
-        if (hospital.patients.includes(patientMrn)) {
+        const patients = database.collection("kaiserPermanente");
+        const family = await patients.findOne({"name": familyName});
+        if (family.patients.includes(patientMrn)) {
             const allPatients = database.collection(process.env.MONGODB_COLLECTION);
             const patient = await allPatients.findOne({"mrn": patientMrn} );
             res.status(200).json(keysToCamel(patient));
@@ -54,4 +65,4 @@ hospitalRouter.get('/:hospital/:patient', async(req, res) => {
     }
 });
 
-module.exports = hospitalRouter;
+module.exports = familyRouter;

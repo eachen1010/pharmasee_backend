@@ -17,16 +17,5 @@ const connectToDb = async () => {
   }
 };
 
-let collection;
-const connectToCollection = async(db, hospital) => {
-    if (collection) {
-        return collection;
-    }
-    try {
-        collection = db.collection(hospital);
-        return collection;
-    } catch (err) {
-        console.log(err.message);
-    }
-}
-module.exports = { connectToDb };
+
+module.exports = connectToDb;

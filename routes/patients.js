@@ -2,6 +2,7 @@ const express = require('express');
 const { keysToCamel } = require('../common/utils');
 require("dotenv").config();
 const connectToDb = require('../server/mongodb');
+const { parse } = require('path');
 const mongodb_collection = process.env.MONGODB_COLLECTION;
 
 const patientRouter = express.Router();
@@ -21,10 +22,10 @@ patientRouter.get('/', async(req, res) => {
 // GET request for one patient by mrn
 patientRouter.get('/:patient_mrn', async(req, res) => {
     try {
-        const { patientMrn } = req.params;
+        const patientMrn = parseInt(req.params.patient_mrn);
         const database = await connectToDb();
         const patients = database.collection(mongodb_collection);
-        const patient = await patients.findOne({"mrn": patientMrn});
+        const patient = await patients.findOne({"mrn": parseInt(patientMrn)});
         res.status(200).json(keysToCamel(patient));
     } catch(err) {
         console.log(err.message);

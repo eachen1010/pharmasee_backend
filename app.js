@@ -5,7 +5,7 @@ require('dotenv').config();
 // routes
 const ddi = require('./routes/ddi');
 const patients = require('./routes/patients');
-const hospitalRouter = require('./routes/addPatients');
+const familyRouter = require('./routes/family');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -18,9 +18,9 @@ app.use(
   
 // add all routes under here
 app.use(express.json()); // for req.body
-app.use('/hospital/:hospital/:patient/ddi', ddi);
+app.use('/family/:family/:patient/ddi', ddi);
 app.use('/patients', patients);
-app.use('/hospital', hospitalRouter);
+app.use('/family', familyRouter);
 
 app.listen(PORT, () => {
     console.log(`Server listening on ${PORT}`);
