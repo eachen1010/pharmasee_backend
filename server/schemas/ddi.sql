@@ -1,0 +1,2 @@
+-- Table: ddi
+-- Table of interactions between drug
