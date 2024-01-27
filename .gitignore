@@ -1,0 +1,14 @@
+
+# vscode
+.vscode/
+
+# npm
+.npm
+
+# node
+node_modules/
+jspm_packages/
+
+# dotenv
+.env
+.env.test
