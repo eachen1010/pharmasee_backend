@@ -102,5 +102,21 @@ familyRouter.put('/:family/update/:patientMrn/:drug/', async(req, res) => {
     }
 });
 
+familyRouter.post('/create/:family', async (req, res) => {
+    try {
+        const database = await connectToDb();
+        const family = req.params.family.toString();
+        const groups = database.collection("kaiserPermanente");
+        const newFamily = await groups.insertOne(
+            {
+                "patients": [],
+                "name": family
+            }
+        )
+        res.status(201).json(keysToCamel(newFamily));
+    } catch(err) {
+        console.log(err);
+    }
+})
 
 module.exports = familyRouter;
