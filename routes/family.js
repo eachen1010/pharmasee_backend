@@ -69,12 +69,12 @@ familyRouter.get('/:family/:patient', async(req, res) => {
 familyRouter.post('/:family/create', async(req, res) => {
     try {
         const familyName = req.params.family.toString();
-        const { patientMrn, firstName, lastName, sex, dob, drugs } = req.body;
+        const { mrn, firstName, lastName, sex, dob, drugs } = req.body;
         const database = await connectToDb();
         const patients = database.collection(mongodb_collection);
         const family = database.collection("kaiserPermanente");
         const newPatient = await patients.insertOne({
-            "mrn": patientMrn,
+            "mrn": mrn,
             "first_name": firstName,
             "last_name": lastName,
             "sex": sex,
