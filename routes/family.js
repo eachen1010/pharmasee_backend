@@ -81,7 +81,7 @@ familyRouter.post('/:family/create', async(req, res) => {
             "dob": dob,
             "drugs": drugs
         });
-        await family.findOneAndUpdate({"name": familyName}, {$push : {patients : patientMrn}})
+        await family.findOneAndUpdate({"name": familyName}, {$push : {patients : mrn}})
         res.status(201).json(keysToCamel(newPatient));
     } catch(err) {
         console.log(err.message);
