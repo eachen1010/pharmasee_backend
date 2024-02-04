@@ -16,7 +16,7 @@ drugsRouter.get('/', async(req, res) => {
 drugsRouter.get('/:drug', async(req, res) => {
     try {
         const drugName = req.params.drug;
-        const similar = await db.query(`SELECT drug_name FROM drugs WHERE LOWER(drug_name) LIKE LOWER(CONCAT('${drugName}', '%'))`);
+        const similar = await db.query(`SELECT drug_name FROM drugs WHERE LOWER(drug_name) LIKE LOWER(CONCAT($1, '%'))`, [drugName]);
         res.status(200).json(keysToCamel(similar));
     } catch(err) {
         res.status(500).send(err.message);

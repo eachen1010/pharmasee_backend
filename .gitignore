@@ -16,3 +16,6 @@ jspm_packages/
 # locks
 package-lock.json
 package.json
+
+# google cloud api
+gc_vision.json
